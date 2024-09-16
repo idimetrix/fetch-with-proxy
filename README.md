@@ -7,6 +7,7 @@ fetch-with-proxy3 is a utility function built on top of the Axios library, desig
 function fetchWithProxy<T = any, D = any>(
   url: string, // URL
   options?: AxiosRequestConfig<D>, // Options (axios based)
+  proxies: Proxy[] = [], // Proxies: http, https, socks4, socks5
   attempts: number = 3, // Number of attempts
   delay: number = 1500, // Delay in milliseconds
   timeout: number = 30 * 1000, // Timeout in milliseconds

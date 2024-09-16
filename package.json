@@ -1,6 +1,6 @@
 {
   "name": "fetch-with-proxy3",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "fetch-with-proxy3 is a utility function built on top of the Axios library, designed to make HTTP(S) requests with proxy support. When a request encounters issues like network errors or timeouts, it uses a specified proxy to attempt the operation. This function can be customized with options such as the proxy configuration, retry count, delay between retries, backoff strategies, and error handling. It leverages Axios' capabilities to enhance reliability in unstable network environments while integrating proxy support for added flexibility.",
   "license": "MIT",
   "author": {
