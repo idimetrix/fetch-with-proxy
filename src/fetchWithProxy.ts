@@ -19,42 +19,35 @@ export async function fetchWithProxy<T = any, D = any>(
   for (const proxy of proxies) {
     let response;
 
-    const value = {
-      host: proxy.host,
-      port: `${proxy.port}`,
-      ...(proxy.username && proxy.password
-        ? { username: proxy.username, password: proxy.password }
-        : {}),
-    } as URL;
-
     if ([PROXY_PROTOCOL.http, PROXY_PROTOCOL.https].includes(proxy.protocol)) {
-      const httpUtl = `http://${[proxy.username && proxy.password ? `${proxy.username}:${proxy.password}` : "", `${proxy.host}:${proxy.port}`].filter(Boolean).join("@")}`;
-      const httpsUrl = `https://${[proxy.username && proxy.password ? `${proxy.username}:${proxy.password}` : "", `${proxy.host}:${proxy.port}`].filter(Boolean).join("@")}`;
+      const proxyUrl = `http://${proxy.username && proxy.password ? `${proxy.username}:${proxy.password}@` : ""}${proxy.host}:${proxy.port}`;
 
       response = await fetchWithRetry<T>(
         url,
         {
           ...options,
-          httpAgent: new HttpProxyAgent(value),
-          httpsAgent: new HttpsProxyAgent(value),
+          httpAgent: new HttpProxyAgent(proxyUrl),
+          httpsAgent: new HttpsProxyAgent(proxyUrl),
         },
         attempts,
         delay,
+        timeout,
       );
     }
 
     if (
       [PROXY_PROTOCOL.socks4, PROXY_PROTOCOL.socks5].includes(proxy.protocol)
     ) {
-      const proxyUrl = `${proxy.protocol}://${[proxy.username && proxy.password ? `${proxy.username}:${proxy.password}` : "", `${proxy.host}:${proxy.port}`].filter(Boolean).join("@")}`;
+      const proxyUrl = `${proxy.protocol}://${proxy.username && proxy.password ? `${proxy.username}:${proxy.password}@` : ""}${proxy.host}:${proxy.port}`;
 
-      const agent = new SocksProxyAgent(value);
+      const agent = new SocksProxyAgent(proxyUrl);
 
       response = await fetchWithRetry(
         url,
         { ...options, httpAgent: agent, httpsAgent: agent },
         attempts,
         delay,
+        timeout,
       );
     }
 

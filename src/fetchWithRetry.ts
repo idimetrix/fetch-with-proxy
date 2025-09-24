@@ -12,40 +12,27 @@ export async function fetchWithRetry<T = any, D = any>(
 
   while (retries < attempts) {
     try {
-      if (options?.cancelToken) {
-        const response = await axios(url, options);
+      // Use AbortController instead of deprecated CancelToken
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeout);
 
-        if (response.status >= 200 && response.status < 300)
-          return { ...response, ok: true };
-        else {
-          if ([404].includes(response.status))
-            return { ...response, ok: false };
-          else
-            throw new Error(
-              `STATUS CODE = "${response.status}", STATUS TEXT = "${response.statusText}", DETAILS = "${response.headers["server"] || ""}"`,
-            );
-        }
+      const response = await axios(url, {
+        ...options,
+        signal: controller.signal,
+        timeout,
+      });
+
+      clearTimeout(timer);
+
+      if (response.status >= 200 && response.status < 300) {
+        return { ...response, ok: true };
       } else {
-        const source = axios.CancelToken.source();
-
-        const timer = setTimeout(() => source.cancel(), timeout);
-
-        const response = await axios(url, {
-          ...options,
-          cancelToken: source.token,
-        });
-
-        clearTimeout(timer);
-
-        if (response.status >= 200 && response.status < 300)
-          return { ...response, ok: true };
-        else {
-          if ([404].includes(response.status))
-            return { ...response, ok: false };
-          else
-            throw new Error(
-              `STATUS CODE = "${response.status}", STATUS TEXT = "${response.statusText}", DETAILS = "${response.headers["server"] || ""}"`,
-            );
+        if ([404].includes(response.status)) {
+          return { ...response, ok: false };
+        } else {
+          throw new Error(
+            `STATUS CODE = "${response.status}", STATUS TEXT = "${response.statusText}", DETAILS = "${response.headers?.server || ""}"`,
+          );
         }
       }
     } catch (error: any) {
@@ -53,7 +40,7 @@ export async function fetchWithRetry<T = any, D = any>(
 
       const messages: string[] = [
         response
-          ? `STATUS CODE = "${response.status}", STATUS TEXT = "${response.statusText}", DETAILS = "${response.headers["server"] || ""}" ${error.message}`
+          ? `STATUS CODE = "${response.status}", STATUS TEXT = "${response.statusText}", DETAILS = "${response.headers?.server || ""}" ${error.message}`
           : error.message,
       ].filter(Boolean);
 
