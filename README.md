@@ -307,13 +307,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Changelog
 
-### v1.0.2
+### v1.0.4
+- Updated lint-staged to latest version (16.2.1)
+- Applied consistent code formatting with double quotes
+- Maintained 100% type safety and test coverage
+- Zero security vulnerabilities
+- Professional code quality assurance
+
+### v1.0.3
 - Updated all dependencies to latest versions
 - Replaced deprecated CancelToken with AbortController
 - Improved TypeScript type safety
 - Enhanced error handling
 - Added comprehensive test suite
 - Updated documentation
+
+### v1.0.2
+- Initial stable release with proxy support
 
 ## Support
 
